@@ -1,73 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+考https://juejin.cn/post/7032079740982788132
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ yarn install
+```
+npm i -g @nestjs/cli  // 全局安装Nest
+nest new project-name  // 创建项目
+yarn 下载依赖
+yarn start:dev
 ```
 
-## Running the app
+常用命令：
 
-```bash
-# development
-$ yarn run start
+- nest g [文件类型] [文件名] [文件目录]
+  - nest g mo(模块)/co(控制器)/service (服务类) 文件名 文件目录，必须先创建模块，文件目录不写默认与文件名相同
 
-# watch mode
-$ yarn run start:dev
+使用 typeOrm
 
-# production mode
-$ yarn run start:prod
+```
+yarn add @nestjs/typeorm typeorm mysql2 @nestjs/config -S
 ```
 
-## Test
+- 增加 .env .env.prod 文件，写入数据库配置
 
-```bash
-# unit tests
-$ yarn run test
+- 增加根据env config 文件
+  / config/env.ts
 
-# e2e tests
-$ yarn run test:e2e
+```
+import * as fs from 'fs';
+import * as path from 'path';
+const isProd = process.env.NODE_ENV === 'production';
 
-# test coverage
-$ yarn run test:cov
+function parseEnv() {
+  const localEnv = path.resolve('.env');
+  const prodEnv = path.resolve('.env.prod');
+
+  if (!fs.existsSync(localEnv) && !fs.existsSync(prodEnv)) {
+    throw new Error('缺少环境配置文件');
+  }
+
+  const filePath = isProd && fs.existsSync(prodEnv) ? prodEnv : localEnv;
+  return { path: filePath };
+}
+export default parseEnv();
+
 ```
 
-## Support
+- 在 app.module.ts，添加imports配置
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // 设置为全局
+      envFilePath: [envConfig.path],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql', // 数据库类型
+        entities: [], // 数据表实体
+        host: configService.get('DB_HOST'), // 主机，默认为localhost
+        port: configService.get<number>('DB_PORT'), // 端口号
+        username: configService.get('DB_USER'), // 用户名
+        password: configService.get('DB_PASSWD'), // 密码
+        database: configService.get('DB_DATABASE'), //数据库名
+        timezone: '+08:00', //服务器上配置的时区
+        synchronize: true, //根据实体自动创建数据库表， 生产环境建议关闭
+      }),
+    }),
+    PostsModule,
+  ],
+```
 
-## Stay in touch
+yarn start:dev 不报错则连接数据库成功
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 实现 CRUD
 
-## License
+- 在 posts 文件夹上新建实体方法，posts.entity.ts
 
-Nest is [MIT licensed](LICENSE).
+```
+//    posts/posts.entity.ts
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity('posts')
+export class PostsEntity {
+  @PrimaryGeneratedColumn()
+  id: number; // 标记为主列，值自动生成
+
+  @Column({ length: 50 })
+  title: string;
+
+  @Column({ length: 20 })
+  author: string;
+
+  @Column('text')
+  content: string;
+
+  @Column({ default: '' })
+  thumb_url: string;
+
+  @Column('tinyint')
+  type: number;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  create_time: Date;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  update_time: Date;
+}
+
+```
