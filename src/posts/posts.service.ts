@@ -44,12 +44,12 @@ export class PostsService {
 
   // 获取指定文章
   async findById(id): Promise<PostsEntity> {
-    return await this.postsRepository.findOne(id);
+    return await this.postsRepository.findOne({ where: { id } });
   }
 
   // 更新文章
   async updateById(id, post): Promise<PostsEntity> {
-    const existPost = await this.postsRepository.findOne(id);
+    const existPost = await this.postsRepository.findOne({ where: { id } });
     if (!existPost) {
       throw new HttpException(`id为${id}的文章不存在`, 401);
     }
@@ -59,7 +59,7 @@ export class PostsService {
 
   // 刪除文章
   async remove(id) {
-    const existPost = await this.postsRepository.findOne(id);
+    const existPost = await this.postsRepository.findOne({ where: { id } });
     if (!existPost) {
       throw new HttpException(`id为${id}的文章不存在`, 401);
     }
