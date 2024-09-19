@@ -29,5 +29,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(3000);
+
+  // 打印端口
+  console.log(`http://localhost:3000/docs`);
 }
 bootstrap();
