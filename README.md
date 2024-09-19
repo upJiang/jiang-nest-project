@@ -449,3 +449,36 @@ jobs:
             docker run -d --name jiang-nest-study -p 3000:3000 registry.cn-shenzhen.aliyuncs.com/jiang-nest/jiang-nest-study:latest
 
 ```
+
+- 腾讯云防火墙放开自定义端口3000
+
+推送代码后就自动部署了，然后打开 http://121.4.86.16:3000/docs
+
+## 配置域名访问接口地址
+
+在nginx 配置文件中添加配置 /www/server/nginx/conf/nginx.conf
+
+// 这个为证书路径，宝塔安装默认为
+ssl_certificate /www/server/panel/vhost/cert/junfeng530.xyz/fullchain.pem; # 替换为你的证书路径
+ssl_certificate_key /www/server/panel/vhost/cert/junfeng530.xyz/privkey.pem; # 替换为你的私钥路径
+
+```
+server {
+    listen 443 ssl;  # 启用 SSL 并监听 443 端口
+    server_name junfeng530.xyz;  # 你的域名
+
+    ssl_certificate /www/server/panel/vhost/cert/junfeng530.xyz/fullchain.pem;  # 替换为你的证书路径
+    ssl_certificate_key /www/server/panel/vhost/cert/junfeng530.xyz/privkey.pem;  # 替换为你的私钥路径
+
+    location /api/ {
+        proxy_pass http://121.4.86.16:3000/;  # 代理到 Docker 容器所在的 3000 端口
+        proxy_set_header Host $host;  # 保持 Host 头部
+        proxy_set_header X-Real-IP $remote_addr;  # 获取真实 IP
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # 传递代理链 IP
+        proxy_set_header X-Forwarded-Proto $scheme;  # 传递协议
+
+        # 处理 URL 重写，将 /api 前缀移除
+        rewrite ^/api/(.*)$ /$1 break;
+    }
+}
+```
