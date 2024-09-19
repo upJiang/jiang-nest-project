@@ -7,7 +7,6 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api'); // 设置全局路由前缀，域名访问的路径加了https://junfeng530.xyz/api/xx，所以这里要加上 api
 
   // 注册全局错误的过滤器
   app.useGlobalFilters(new HttpExceptionFilter());

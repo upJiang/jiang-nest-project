@@ -456,6 +456,8 @@ jobs:
 
 ## 配置域名访问接口地址
 
+为了区分域名以外其它的服务，添加/api匹配
+
 在nginx 配置文件中添加配置 /www/server/nginx/conf/nginx.conf
 
 // 这个为证书路径，宝塔安装默认为
