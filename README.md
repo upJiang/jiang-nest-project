@@ -394,7 +394,7 @@ CMD ["yarn", "start"]
 - 在 Github 仓库中的新建 5 个 Repository secrets
 
 SERVER_HOST：服务器 ip
-SERVER_USERNAME：服务器登录用户名，一般 root
+SERVER_USERNAME：服务器登录用户名， 一般 root
 SERVER_SSH_KEY：Github 的私钥，服务器需要要生成相对应的公钥，这里不会的可以参考我的 过去文章
 ALIYUN_DOCKER_USERNAME：阿里云 Docker 用户名
 ALIYUN_DOCKER_PASSWORD：阿里云 Docker 密码
