@@ -73,6 +73,14 @@ imports: [
 
 yarn start:dev 不报错则连接数据库成功
 
+nest 可以使用的命令：
+
+- nest new 快速创建项目
+- nest generate 快速生成各种代码
+- nest build 使用 tsc 或者 webpack 构建代码
+- nest start 启动开发服务，支持 watch 和调试
+- nest info 打印 node、npm、nest 包的依赖版本
+
 常用命令：
 
 \- nest g [文件类型] [文件名] [文件目录]
@@ -484,3 +492,40 @@ server {
     }
 }
 ```
+
+## 调试，debugger
+
+vscode 安装插件 JavaScript Debugger，选择新建 JavaScript Debugger Terminal 终端，执行yarn dev 即可
+
+在代码中写入debugger即可调试
+
+## 添加静态资源访问
+
+在 main.ts 中添加
+
+```
+
+import { NestExpressApplication } from '@nestjs/platform-express';
+const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+// 支持静态资源
+// app.useStaticAssets(join(__dirname, '..', 'public'), { prefix: '/static' }); // 网上的行不通
+app.useStaticAssets('public', { prefix: '/static' }); // 可以
+
+```
+
+## 生命周期
+
+- 模块初始化：OnModuleInit
+- 应用启动：OnApplicationBootstrap
+- 模块销毁：OnModuleDestroy
+- 应用关闭前：BeforeApplicationShutdown
+- 应用正式关闭：OnApplicationShutdown
+
+执行顺序如上顺序，在模块中 controller => service => module 文件依次执行
+
+## 用户登录
+
+### JWT
+
+> JSON Web Token ，简称 JWT ，一种基于 JSON 的认证授权机制，是一个非常轻巧的标准规范。这个规范允许我们在用户和服务器之间传递安全可靠的信息。
