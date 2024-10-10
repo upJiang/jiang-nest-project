@@ -77,9 +77,10 @@ nest 可以使用的命令：
 
 - nest new 快速创建项目
 - nest generate 快速生成各种代码
-- nest build 使用 tsc 或者 webpack 构建代码
-- nest start 启动开发服务，支持 watch 和调试
-- nest info 打印 node、npm、nest 包的依赖版本
+- nest build 使用 `tsc` 或者 `webpack` 构建代码
+- nest start 启动开发服务，支持 `watch` 和调试
+- nest info 打印 `node、npm、nest` 包的依赖版本
+- nest g resource xxx 快速创建 `REST API` 的模块
 
 常用命令：
 
@@ -529,3 +530,41 @@ app.useStaticAssets('public', { prefix: '/static' }); // 可以
 ### JWT
 
 > JSON Web Token ，简称 JWT ，一种基于 JSON 的认证授权机制，是一个非常轻巧的标准规范。这个规范允许我们在用户和服务器之间传递安全可靠的信息。
+
+#### 接入 jwt
+
+- 创建一个 user 模块
+
+```
+nest g resource user
+
+选择 RESR API
+```
+
+- 使用 `bcryptjs` 加密用户密码
+
+```
+yarn add bcryptjs
+```
+
+用法：
+
+```
+/**
+ * 加密处理 - 同步方法
+ * bcryptjs.hashSync(data, salt)
+ *    - data  要加密的数据
+ *    - slat  用于哈希密码的盐。如果指定为数字，则将使用指定的轮数生成盐并将其使用。推荐 10
+ */
+const hashPassword = bcryptjs.hashSync(password, 10)
+
+
+/**
+ * 校验 - 使用同步方法
+ * bcryptjs.compareSync(data, encrypted)
+ *    - data        要比较的数据, 使用登录时传递过来的密码
+ *    - encrypted   要比较的数据, 使用从数据库中查询出来的加密过的密码
+ */
+const isOk = bcryptjs.compareSync(password, encryptPassword)
+
+```
