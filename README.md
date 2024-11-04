@@ -494,6 +494,69 @@ server {
 }
 ```
 
+_为了不影响之前的域名文件，需要多增加一条记录_
+
+### 添加子域名解析
+
+在有域名的腾讯云网站中，打开 https://console.cloud.tencent.com/cns
+
+- 添加域名：blog.junfeng530.xyz
+- 会提示：请前往域名 junfeng530.xyz 的 DNS服务商处为域名添加以下 TXT 解析记录。
+- 在域名 junfeng530.xyz 的 DNS服务商，其实就是域名绑定的服务器中的腾讯云帐号中，打开https://console.cloud.tencent.com/cns/- detail/junfeng530.xyz/records，按照指引添加解析记录，添加完大概等待一两分钟刷新后便有一条新的解析记录
+
+刷新后开启解析，会报：子域名未正确设置 NS 记录
+继续按照指引添加记录
+
+修改/www/server/nginx/conf/nginx.conf，添加配置
+
+```
+server {
+    listen 443 ssl;  # 启用 SSL 并监听 443 端口
+    server_name junfeng530.xyz;  # 你的域名
+
+    ssl_certificate /www/server/panel/vhost/cert/junfeng530.xyz/fullchain.pem;  # 替换为你的证书路径
+    ssl_certificate_key /www/server/panel/vhost/cert/junfeng530.xyz/privkey.pem;  # 替换为你的私钥路径
+
+    location /api/ {
+        proxy_pass http://121.4.86.16:3000/;  # 代理到 Docker 容器所在的 3000 端口
+        proxy_set_header Host $host;  # 保持 Host 头部
+        proxy_set_header X-Real-IP $remote_addr;  # 获取真实 IP
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # 传递代理链 IP
+        proxy_set_header X-Forwarded-Proto $scheme;  # 传递协议
+
+        # 处理 URL 重写，将 /api 前缀移除
+        rewrite ^/api/(.*)$ /$1 break;
+    }
+
+     location / {
+        root /www/wwwroot/junfeng530.xyz;  # 设置网站文件的路径
+        index index.html;  # 设置默认首页文件
+        try_files $uri $uri/ =404;  # 处理文件请求或返回 404
+    }
+}
+
+server {
+    listen 443 ssl;  # 启用 SSL 并监听 443 端口
+    server_name blog.junfeng530.xyz;  # 子域名
+
+    ssl_certificate /www/server/panel/vhost/cert/blog.junfeng530.xyz/fullchain.pem;  # 替换为你的子域名证书路径
+    ssl_certificate_key /www/server/panel/vhost/cert/blog.junfeng530.xyz/privkey.pem;  # 替换为你的子域名私钥路径
+
+    location / {
+        root /www/wwwroot/blog.junfeng530.xyz;  # 设置子域名网站的路径
+        index index.html;  # 设置默认首页文件
+        try_files $uri $uri/ =404;  # 处理文件请求或返回 404
+    }
+}
+
+```
+
+### 在宝塔的网站中，添加 blog.junfeng.xyz 的网站，是为了添加证书方便
+
+申请证书 https://console.cloud.tencent.com/ssl
+
+在含服务器的腾讯云网站中申请证书，现在申请证书只有90天有效期，蛋疼，按照指引添加记录，或者选择自动验证，证书验证完并签发后，将证书填入到宝塔的子域名ssl设置中
+
 ## 调试，debugger
 
 vscode 安装插件 JavaScript Debugger，选择新建 JavaScript Debugger Terminal 终端，执行yarn dev 即可
@@ -533,10 +596,10 @@ app.useStaticAssets('public', { prefix: '/static' }); // 可以
 
 #### 接入 jwt
 
-- 创建一个 user 模块
+- 创建一个 auth 模块
 
 ```
-nest g resource user
+nest g resource auth
 
 选择 RESR API
 ```
@@ -566,5 +629,63 @@ const hashPassword = bcryptjs.hashSync(password, 10)
  *    - encrypted   要比较的数据, 使用从数据库中查询出来的加密过的密码
  */
 const isOk = bcryptjs.compareSync(password, encryptPassword)
+```
+
+### 编写文件
+
+- 定义字段,id name password，`auth.entity.ts`
+
+```
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity()
+export class NV_Users {
+// id为主键并且自动递增
+@PrimaryGeneratedColumn()
+id: number;
+
+@Column()
+username: string;
+
+@Column()
+password: string;
+}
+```
+
+- 在app.module.ts 中自动注册该表
+
+```
+import { NV_Users } from './auth/entities/auth.entity';
+
+ entities: [PostsEntity, NV_Users],
+```
+
+- 在 auth.service.ts 中编写注册登录方法，注册Repository
+
+```
+import { Injectable } from '@nestjs/common';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NV_Users } from './entities/auth.entity';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(NV_Users) private readonly user: Repository<NV_Users>,
+  ) {}
+
+  // 注册
+  signup(signupData: CreateAuthDto) {
+    console.log(signupData);
+    return '注册成功';
+  }
+
+  // 登录
+  login(loginData: CreateAuthDto) {
+    console.log(loginData);
+    return '登录成功';
+  }
+}
 
 ```
