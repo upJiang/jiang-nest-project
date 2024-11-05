@@ -7,7 +7,9 @@ import { PostsModule } from './posts/posts.module';
 import envConfig from '../config/env';
 import { PostsEntity } from './posts/posts.entity';
 import { AuthModule } from './auth/auth.module';
-import { NV_Users } from './auth/entities/auth.entity';
+import { AuthEntity } from './auth/entities/auth.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { jwtAuthGuard } from './auth/jwt-auth.grard';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { NV_Users } from './auth/entities/auth.entity';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'mysql', // 数据库类型
-        entities: [PostsEntity, NV_Users], // 数据表实体，synchronize为true时，自动创建表，生产环境建议关闭
+        entities: [AuthEntity, PostsEntity], // 数据表实体，synchronize为true时，自动创建表，生产环境建议关闭
         host: configService.get('DB_HOST'), // 主机，默认为localhost
         port: configService.get<number>('DB_PORT'), // 端口号
         username: configService.get('DB_USER'), // 用户名
@@ -34,6 +36,13 @@ import { NV_Users } from './auth/entities/auth.entity';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  // 注册为全局守卫
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: jwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

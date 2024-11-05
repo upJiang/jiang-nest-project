@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
-export class NV_Users {
+@Entity('auth')
+export class AuthEntity {
   // id为主键并且自动递增
   @PrimaryGeneratedColumn()
   id: number;

@@ -503,6 +503,7 @@ _为了不影响之前的域名文件，需要多增加一条记录_
 - 添加域名：blog.junfeng530.xyz
 - 会提示：请前往域名 junfeng530.xyz 的 DNS服务商处为域名添加以下 TXT 解析记录。
 - 在域名 junfeng530.xyz 的 DNS服务商，其实就是域名绑定的服务器中的腾讯云帐号中，打开https://console.cloud.tencent.com/cns/- detail/junfeng530.xyz/records，按照指引添加解析记录，添加完大概等待一两分钟刷新后便有一条新的解析记录
+- 需要添加 A @ 记录
 
 刷新后开启解析，会报：子域名未正确设置 NS 记录
 继续按照指引添加记录
@@ -596,42 +597,49 @@ app.useStaticAssets('public', { prefix: '/static' }); // 可以
 
 #### 接入 jwt
 
-- 创建一个 auth 模块
-
-```
-nest g resource auth
-
-选择 RESR API
 ```
 
 - 使用 `bcryptjs` 加密用户密码
 
 ```
+
 yarn add bcryptjs
+
 ```
 
 用法：
 
 ```
-/**
- * 加密处理 - 同步方法
- * bcryptjs.hashSync(data, salt)
- *    - data  要加密的数据
- *    - slat  用于哈希密码的盐。如果指定为数字，则将使用指定的轮数生成盐并将其使用。推荐 10
- */
-const hashPassword = bcryptjs.hashSync(password, 10)
 
+/\*\*
 
-/**
- * 校验 - 使用同步方法
- * bcryptjs.compareSync(data, encrypted)
- *    - data        要比较的数据, 使用登录时传递过来的密码
- *    - encrypted   要比较的数据, 使用从数据库中查询出来的加密过的密码
- */
-const isOk = bcryptjs.compareSync(password, encryptPassword)
+- 加密处理 - 同步方法
+- bcryptjs.hashSync(data, salt)
+- - data 要加密的数据
+- - slat 用于哈希密码的盐。如果指定为数字，则将使用指定的轮数生成盐并将其使用。推荐 10
+    \*/
+    const hashPassword = bcryptjs.hashSync(password, 10)
+
+/\*\*
+
+- 校验 - 使用同步方法
+- bcryptjs.compareSync(data, encrypted)
+- - data 要比较的数据, 使用登录时传递过来的密码
+- - encrypted 要比较的数据, 使用从数据库中查询出来的加密过的密码
+    \*/
+    const isOk = bcryptjs.compareSync(password, encryptPassword)
+
 ```
 
 ### 编写文件
+
+- 创建一个 auth 模块
+
+```
+
+nest g resource auth
+
+选择 RESR API
 
 - 定义字段,id name password，`auth.entity.ts`
 
@@ -652,12 +660,31 @@ password: string;
 }
 ```
 
+- 在 auth.module.ts 中将仓库注入
+
+```
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { AuthEntity } from './entities/auth.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([AuthEntity])],
+  controllers: [AuthController],
+  providers: [AuthService],
+})
+export class AuthModule {}
+
+```
+
 - 在app.module.ts 中自动注册该表
 
 ```
-import { NV_Users } from './auth/entities/auth.entity';
+import { AuthModule } from './auth/auth.module';
+import { AuthEntity } from './auth/entities/auth.entity';
 
- entities: [PostsEntity, NV_Users],
+entities: [AuthEntity],
 ```
 
 - 在 auth.service.ts 中编写注册登录方法，注册Repository
@@ -667,17 +694,18 @@ import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NV_Users } from './entities/auth.entity';
+import { AuthEntity } from './entities/auth.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(NV_Users) private readonly user: Repository<NV_Users>,
+    @InjectRepository(AuthEntity)
+    private readonly authRepository: Repository<AuthEntity>,
   ) {}
 
   // 注册
   signup(signupData: CreateAuthDto) {
-    console.log(signupData);
+    console.log(signupData, this.authRepository);
     return '注册成功';
   }
 
@@ -685,6 +713,319 @@ export class AuthService {
   login(loginData: CreateAuthDto) {
     console.log(loginData);
     return '登录成功';
+  }
+}
+
+```
+
+- 安装 Database Client 插件链接数据库，执行 yarn dev，执行后，数据已经创建好auth的表
+
+- 编写 auth.controller.ts
+
+```
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { CreateAuthDto } from './dto/create-auth.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  /**
+   * 注册
+   * @param name 姓名
+   * @param password 密码
+   */
+  @Post('/signup')
+  signup(@Body() signupData: CreateAuthDto) {
+    return this.authService.signup(signupData);
+  }
+
+  /**
+   * 登录
+   * @param name 姓名
+   * @param password 密码
+   */
+  @Post('/login')
+  login(@Body() loginData: CreateAuthDto) {
+    return this.authService.login(loginData);
+  }
+}
+
+```
+
+- 编写 create-auth.dto.ts
+
+```
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty } from 'class-validator';
+
+export class CreateAuthDto {
+  @ApiProperty({ description: '姓名' })
+  @IsNotEmpty({ message: '姓名必填' })
+  readonly username: string;
+
+  @ApiProperty({ description: '密码' })
+  @IsNotEmpty({ message: '密码必填' })
+  readonly password: string;
+}
+
+```
+
+- 在 apiFox 测试接口 http://127.0.0.1:3000/auth/signup
+
+## 编写业务代码使用jwt
+
+安装包:
+`bcryptjs` 这个是对用户密码进行加密的
+`@nestjs/jwt` 用于生成token
+
+```
+yarn add bcryptjs @nestjs/jwt
+```
+
+- src 目录下新建 `token` 配置文件 `src/common/constants.ts`
+
+```
+export const jwtConstants = {
+    secret: "leeKey", // 密钥
+    expiresIn: "60s" // token有效时间
+}
+
+```
+
+- 在 auth.module.ts 中配置 jwt
+
+```
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from '../common/constants';
+
+ imports: [
+    TypeOrmModule.forFeature([AuthEntity]),
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: jwtConstants.expiresIn },
+    }),
+  ],
+
+```
+
+- 编写注册登录逻辑
+
+```
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { AuthEntity } from './entities/auth.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcryptjs from 'bcryptjs';
+import { JwtService } from '@nestjs/jwt';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(AuthEntity) private readonly auth: Repository<AuthEntity>,
+    private readonly JwtService: JwtService,
+  ) {}
+
+  // 注册
+  async signup(signupData: CreateAuthDto) {
+    const findUser = await this.auth.findOne({
+      where: { username: signupData.username },
+    });
+    if (findUser && findUser.username === signupData.username)
+      return '用户已存在';
+    // 对密码进行加密处理
+    signupData.password = bcryptjs.hashSync(signupData.password, 10);
+    await this.auth.save(signupData);
+    return '注册成功';
+  }
+
+  // 登录
+  async login(loginData: CreateAuthDto) {
+    const findUser = await this.auth.findOne({
+      where: { username: loginData.username },
+    });
+    // 没有找到
+    if (!findUser) return new BadRequestException('用户不存在');
+
+    // 找到了对比密码
+    const compareRes: boolean = bcryptjs.compareSync(
+      loginData.password,
+      findUser.password,
+    );
+    // 密码不正确
+    if (!compareRes) return new BadRequestException('密码不正确');
+    const payload = { username: findUser.username };
+
+    return {
+      access_token: this.JwtService.sign(payload),
+      msg: '登录成功',
+    };
+  }
+}
+```
+
+## 身份验证拦截
+
+### 编写自定义装饰器
+
+`src/common/public.decorator.ts`
+
+```
+import { SetMetadata } from "@nestjs/common";
+
+export const IS_PUBLIC_KEY = 'isPublic'
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
+```
+
+### 安装依赖
+
+```
+yarn add @nestjs/passport passport-jwt passport
+yarn add -D @types/passport-jwt
+```
+
+- 新建 `src/auth/jwt-auth.grard.ts` 文件，用于全局守卫，将未携带 `token` 的接口进行拦截
+
+```
+import { ExecutionContext, Injectable } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport"
+import { Reflector } from "@nestjs/core";
+import { Observable } from "rxjs"
+import { IS_PUBLIC_KEY } from "src/common/public.decorator";
+
+
+@Injectable()
+
+export class jwtAuthGuard extends AuthGuard("jwt") {
+    constructor(private reflector: Reflector) {
+        super()
+    }
+
+    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+            context.getHandler(),
+            context.getClass()
+        ])
+        console.log(isPublic, "isPublic");
+        if (isPublic) return true
+        return super.canActivate(context)
+    }
+}
+
+```
+
+- 新建 验证策略文件 /src/auth/jwt-auth.strategy.ts
+
+```
+import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { jwtConstants } from '../common/constants';
+
+export interface JwtPayload {
+  username: string;
+}
+
+@Injectable()
+// 验证请求头中的token
+export default class JwtAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: jwtConstants.secret,
+    });
+  }
+
+  async validate(payload: JwtPayload) {
+    console.log(payload.username);
+    const { username } = payload;
+    return {
+      username,
+    };
+  }
+}
+
+```
+
+- 在 `auth.module.ts` 的 `providers` 中配置 `JwtAuthStrategy`
+
+```
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthEntity } from './entities/auth.entity';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from '../common/constants';
+import JwtAuthStrategy from './jwt-auth.strategy';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([AuthEntity]),
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: jwtConstants.expiresIn },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, JwtAuthStrategy],
+})
+export class AuthModule {}
+
+```
+
+- 在 `app.module.ts` 将其注册为全局守卫
+
+```
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/jwt-auth.grard';
+
+ // 注册为全局守卫
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: jwtAuthGuard,
+    },
+  ],
+```
+
+- 给通用接口(注册和登录接口)都加上@Public装饰器，绕过检测 `auth.controller.ts`
+
+```
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { CreateAuthDto } from './dto/create-auth.dto';
+import { Public } from 'src/common/public.decorator';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  /**
+   * 注册
+   * @param name 姓名
+   * @param password 密码
+   */
+  @Public()
+  @Post('/signup')
+  signup(@Body() signupData: CreateAuthDto) {
+    return this.authService.signup(signupData);
+  }
+
+  /**
+   * 登录
+   * @param name 姓名
+   * @param password 密码
+   */
+  @Public()
+  @Post('/login')
+  login(@Body() loginData: CreateAuthDto) {
+    return this.authService.login(loginData);
   }
 }
 
