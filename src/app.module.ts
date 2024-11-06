@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { AuthEntity } from './auth/entities/auth.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { jwtAuthGuard } from './auth/jwt-auth.grard';
+import { RedisService } from './redis/redis.service';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { jwtAuthGuard } from './auth/jwt-auth.grard';
     }),
     PostsModule,
     AuthModule,
+    RedisModule,
   ],
   controllers: [AppController],
   // 注册为全局守卫
@@ -43,6 +46,7 @@ import { jwtAuthGuard } from './auth/jwt-auth.grard';
       provide: APP_GUARD,
       useClass: jwtAuthGuard,
     },
+    RedisService,
   ],
 })
 export class AppModule {}

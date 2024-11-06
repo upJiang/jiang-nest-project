@@ -5,12 +5,14 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(AuthEntity) private readonly auth: Repository<AuthEntity>,
     private readonly JwtService: JwtService,
+    private readonly redisService: RedisService, // 注册redis控制器
   ) {}
 
   // 注册
@@ -23,6 +25,8 @@ export class AuthService {
     // 对密码进行加密处理
     signupData.password = bcryptjs.hashSync(signupData.password, 10);
     await this.auth.save(signupData);
+    // 尝试将注册成功的用户存入redis中
+    this.redisService.set(signupData.username, signupData.password);
     return '注册成功';
   }
 

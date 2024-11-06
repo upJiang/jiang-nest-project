@@ -1030,3 +1030,153 @@ export class AuthController {
 }
 
 ```
+
+## 使用 Redis
+
+### 在腾讯云服务器上安装 redis
+
+在腾讯云终端执行，不同的操作系统命令不同，这里是linux CentOS
+
+```
+# 安装 redis
+$ yum install redis
+
+# 启动 redis
+systemctl start redis
+
+# 设置开机自启
+systemctl enable redis
+
+# 验证 redis 是否正常启动
+redis-cli ping
+```
+
+- 安装完后，打开 /etc/redis.conf
+
+```
+设置密码：
+requirepass jiang
+
+Redis 监听地址和端口:
+bind 127.0.0.1 // 需要连接到服务器，修改成自己的 0.0.0.0
+
+修改端口
+port 6379  # 默认为 6379
+```
+
+修改配置后重启 redis
+
+```
+systemctl restart redis
+```
+
+### 在 nest 中使用 redis
+
+- 安装依赖
+  ioredis 是国内 nodejs 的最广泛的 redis 客户端
+
+```
+yarn add ioredis
+```
+
+- 创建 redis 管理模块
+
+```
+nest generate service redis
+```
+
+设置 redis，并注册一些方法，在生成的 redis.service.ts 中写入
+
+```
+import { Injectable } from '@nestjs/common';
+import Redis from 'ioredis';
+
+@Injectable()
+export class RedisService {
+  private redisClient: Redis;
+
+  constructor() {
+    // 配置 Redis 连接
+    this.redisClient = new Redis({
+      host: 'localhost', // Redis 服务器地址
+      port: 6379, // Redis 端口
+      password: 'yourpassword', // 如果设置了密码，请输入
+      db: 0, // 使用的 Redis 数据库，默认为 0
+    });
+  }
+
+  // 通过 get 方法访问 Redis 中的键值
+  async get(key: string): Promise<string> {
+    return await this.redisClient.get(key);
+  }
+
+  // 通过 set 方法将值存入 Redis 中
+  async set(key: string, value: string): Promise<void> {
+    await this.redisClient.set(key, value);
+  }
+
+  // 关闭 Redis 客户端连接
+  async onModuleDestroy() {
+    await this.redisClient.quit();
+  }
+}
+
+```
+
+- 创建 module，负责将 RedisService 提供给其他模块使用，在app.module.ts 中会自动注入
+
+```
+nest generate module redis
+```
+
+写入 `redis.module.ts`
+
+```
+import { Module } from '@nestjs/common';
+import { RedisService } from './redis.service';
+
+@Module({
+  providers: [RedisService],
+  exports: [RedisService], // 导出 RedisService 以供其他模块使用
+})
+export class RedisModule {}
+
+```
+
+- 腾讯云服务器需要放开 6379 端口，需要修改redis配置文件 bind 0.0.0.0
+
+## 在其它模块中使用 redis
+
+- 步骤一：在 auth.module.ts 中导入 redis.module.ts
+
+```
+import { RedisModule } from '../redis/redis.module'; // 添加
+
+ imports: [
+    TypeOrmModule.forFeature([AuthEntity]),
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: jwtConstants.expiresIn },
+    }),
+    RedisModule, // 添加
+  ],
+```
+
+- 步骤二：在 auth.service.ts 中导入 redis.service.ts，并调用方法使用
+
+```
+import { RedisService } from '../redis/redis.service';
+
+ constructor(
+    private readonly redisService: RedisService, // 注册redis控制器
+  ) {}
+
+
+  // 尝试将注册成功的用户存入redis中
+    this.redisService.set(signupData.username, signupData.password);
+
+```
+
+- 在 apiFox 中调用 http://127.0.0.1:3000/auth/signup
+
+- 在 插件 Database 中，连接 redis 数据库，用户名不用填写，其它正常填写，连接成功后，会发现多了一条刚刚注册的用户信息

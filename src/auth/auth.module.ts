@@ -6,6 +6,7 @@ import { AuthEntity } from './entities/auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '../common/constants';
 import JwtAuthStrategy from './jwt-auth.strategy';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import JwtAuthStrategy from './jwt-auth.strategy';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
+    RedisModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtAuthStrategy],
