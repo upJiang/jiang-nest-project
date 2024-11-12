@@ -8,7 +8,8 @@ export class UploadService {
   async uploadFile(file: Express.Multer.File): Promise<{ url: string }> {
     console.log('file', file);
 
-    const uploadPath = path.join(__dirname, '..', 'uploads'); // 检查路径是否正确
+    const uploadPath = '/var/uploads';
+    // const uploadPath = path.join(__dirname, '..', 'uploads'); // 检查路径是否正确
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
@@ -31,10 +32,6 @@ export class UploadService {
       throw new BadRequestException('File is too large!');
     }
 
-    // 保存文件
-    const filePath = `${uploadPath}/${Date.now()}-${file.originalname}`;
-    await fs.promises.writeFile(filePath, file.buffer);
-
-    return { url: filePath };
+    return { url: file.path };
   }
 }
