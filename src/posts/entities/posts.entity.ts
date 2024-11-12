@@ -17,9 +17,6 @@ export class PostsEntity {
   @Column({ default: '' })
   thumb_url: string;
 
-  @Column('tinyint')
-  type: number;
-
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   create_time: Date;
 
