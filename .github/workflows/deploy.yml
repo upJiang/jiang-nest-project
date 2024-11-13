@@ -38,8 +38,20 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            # 登录阿里云 Docker registry
             docker login --username ${{ secrets.ALIYUN_DOCKER_USERNAME }} --password ${{ secrets.ALIYUN_DOCKER_PASSWORD }} registry.cn-shenzhen.aliyuncs.com
+
+            # 拉取最新的 Docker 镜像
             docker pull registry.cn-shenzhen.aliyuncs.com/jiang-nest/jiang-nest-study:latest
+
+            # 停止并删除已经存在的名为 jiang-nest-study 的容器（如果有）
             docker ps -q --filter "name=jiang-nest-study" | grep -q . && docker stop jiang-nest-study || echo "Container jiang-nest-study is not running"
             docker ps -a -q --filter "name=jiang-nest-study" | grep -q . && docker rm jiang-nest-study || echo "Container jiang-nest-study does not exist"
-            docker run -d --name jiang-nest-study -p 3000:3000 registry.cn-shenzhen.aliyuncs.com/jiang-nest/jiang-nest-study:latest
+
+            # 检查端口 3000 是否被占用，如果被占用，停止并删除相关容器
+            docker ps -q --filter "publish=3000" | grep -q . && \
+              docker ps -q --filter "publish=3000" | xargs -I {} docker stop {} && \
+              docker ps -a -q --filter "publish=3000" | xargs -I {} docker rm {} || echo "Port 3000 is not occupied"
+
+            # 运行新容器并挂载卷
+            docker run -d --name jiang-nest-study -p 3000:3000 -v /www/wwwroot/blog.junfeng530.xyz/uploads:/www/wwwroot/blog.junfeng530.xyz/uploads registry.cn-shenzhen.aliyuncs.com/jiang-nest/jiang-nest-study:latest
