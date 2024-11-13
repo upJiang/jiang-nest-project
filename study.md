@@ -52,6 +52,8 @@ export class UploadController {
       storage: multer.diskStorage({
         destination(_req, _file, cb) {
           const configService = new ConfigService();
+          console.log('当前环境NODE_ENV', configService.get('NODE_ENV'));
+
           const uploadPath =
             configService.get('NODE_ENV') === 'production'
               ? '/www/wwwroot/blog.junfeng530.xyz/uploads'
@@ -79,7 +81,6 @@ export class UploadController {
     return result;
   }
 }
-
 ```
 
 - `/src/upload/upload.service.ts` 设置对文件类型大小的限制
