@@ -1,8 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-const isProd = process.env.NODE_ENV === 'production';
+import { ConfigService } from '@nestjs/config';
 
 function parseEnv() {
+  const configService = new ConfigService();
+  const isProd = configService.get<string>('NODE_ENV') === 'production';
+
   const localEnv = path.resolve('.env');
   const prodEnv = path.resolve('.env.prod');
 
