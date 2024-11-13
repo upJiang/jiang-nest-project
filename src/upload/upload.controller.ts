@@ -1,49 +1,49 @@
-// upload/upload.controller.ts
 import {
   Controller,
   Post,
   UseInterceptors,
-  UploadedFile,
   UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import * as multer from 'multer';
 import * as path from 'path';
+import * as fs from 'fs';
+
+const isProd = process.env.NODE_ENV === 'production';
 
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post('/single')
+  @Post('/files')
   @UseInterceptors(
-    FileInterceptor('file', {
+    FilesInterceptor('files', undefined, {
       storage: multer.diskStorage({
         destination: (_req, _file, cb) => {
-          const uploadPath = '/www/wwwroot/blog.junfeng530.xyz/uploads'; // 指定为服务器的根目录下
-          // const uploadPath = path.join(__dirname, '..', 'uploads'); // 自定义上传路径
-          cb(null, uploadPath);
+          const uploadPath = isProd
+            ? '/www/wwwroot/blog.junfeng530.xyz/uploads'
+            : path.join(__dirname, '..', '..', 'uploads');
+
+          // 检查目标路径是否存在，如果不存在则创建
+          if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+          }
+
+          cb(null, uploadPath); // 目录设置
         },
-        filename: (req, file, cb) => {
+        filename: (_req, file, cb) => {
           const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
           const fileExtension = path.extname(file.originalname);
-          cb(null, `${uniqueSuffix}${fileExtension}`);
+          cb(null, `${uniqueSuffix}${fileExtension}`); // 设置文件名
         },
       }),
     }),
   )
-  async uploadSingleFile(@UploadedFile() file: Express.Multer.File) {
-    return this.uploadService.uploadFile(file);
-  }
-
-  @Post('/multiple')
-  @UseInterceptors(FilesInterceptor('files'))
-  async uploadMultipleFiles(
-    @UploadedFiles() files: Array<Express.Multer.File>,
-  ) {
-    const results = await Promise.all(
+  async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
+    const result = await Promise.all(
       files.map((file) => this.uploadService.uploadFile(file)),
     );
-    return results;
+    return result;
   }
 }

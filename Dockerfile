@@ -16,7 +16,7 @@ COPY . .
 # 构建 Nest 应用
 RUN yarn build
 
-# Docker 容器可能无法直接访问宿主机路径，声明挂载点将使宿主机的目录映射到容器中的目录，
+# Docker 容器可能无法直接访问宿主机路径，声明挂载点将使宿主机的目录映射到容器中的目录
 VOLUME ["/www/wwwroot/blog.junfeng530.xyz/uploads"]
 
 # 绑定应用到 3000 端口

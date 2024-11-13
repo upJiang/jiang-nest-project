@@ -1,8 +1,0 @@
-version: '3'
-services:
-  nest-app:
-    build: .
-    volumes:
-      - /www/wwwroot/blog.junfeng530.xyz/uploads:/www/wwwroot/blog.junfeng530.xyz/uploads
-    ports:
-      - '3000:3000'

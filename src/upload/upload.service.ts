@@ -1,21 +1,8 @@
-// upload/upload.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
 
 @Injectable()
 export class UploadService {
   async uploadFile(file: Express.Multer.File): Promise<{ url: string }> {
-    console.log('file', file);
-
-    const uploadPath = '/www/wwwroot/blog.junfeng530.xyz/uploads';
-    // const uploadPath = path.join(__dirname, '..', 'uploads'); // 检查路径是否正确
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-
-    console.log('uploadPath', uploadPath);
-
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
