@@ -20,7 +20,7 @@ export class UploadController {
     FileInterceptor('file', {
       storage: multer.diskStorage({
         destination: (_req, _file, cb) => {
-          const uploadPath = '/var/uploads'; // 指定为服务器的根目录下
+          const uploadPath = '/www/wwwroot/blog.junfeng530.xyz'; // 指定为服务器的根目录下
           // const uploadPath = path.join(__dirname, '..', 'uploads'); // 自定义上传路径
           cb(null, uploadPath);
         },
