@@ -21,11 +21,6 @@ export class UploadController {
       storage: multer.diskStorage({
         destination(_req, _file, cb) {
           const configService = new ConfigService();
-          console.log(
-            '当前环境NODE_ENV',
-            configService.get('NODE_ENV'),
-            configService.get('DB_PASSWD'),
-          );
 
           const uploadPath =
             configService.get('NODE_ENV') === 'production'
