@@ -8,7 +8,7 @@ export class UploadService {
   async uploadFile(file: Express.Multer.File): Promise<{ url: string }> {
     console.log('file', file);
 
-    const uploadPath = '/www/wwwroot/blog.junfeng530.xyz';
+    const uploadPath = '/www/wwwroot/blog.junfeng530.xyz/uploads';
     // const uploadPath = path.join(__dirname, '..', 'uploads'); // 检查路径是否正确
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });

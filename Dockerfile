@@ -16,6 +16,9 @@ COPY . .
 # 构建 Nest 应用
 RUN yarn build
 
+# 声明挂载点
+VOLUME ["/www/wwwroot/blog.junfeng530.xyz/uploads"]
+
 # 绑定应用到 3000 端口
 EXPOSE 3000
 
