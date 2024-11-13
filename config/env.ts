@@ -1,10 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+const isProd = process.env.NODE_ENV === 'production';
 
 function parseEnv() {
-  console.log('当前环境NODE_ENV', process);
-  const isProd = process.env.NODE_ENV === 'production';
-
   console.log('当前环境NODE_ENV', process.env.NODE_ENV);
 
   const localEnv = path.resolve('.env');
