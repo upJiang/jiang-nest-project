@@ -5,15 +5,10 @@ import { TransformInterceptor } from './core/interceptor/transform/transform.int
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { LoggerService } from './logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // 注册全局错误的过滤器
-  app.useGlobalFilters(new HttpExceptionFilter());
-
-  // 全局注册拦截器
-  app.useGlobalInterceptors(new TransformInterceptor());
 
   // 注册swagger
   const config = new DocumentBuilder()
@@ -30,6 +25,12 @@ async function bootstrap() {
 
   // 支持静态资源
   app.useStaticAssets('public', { prefix: '/static' });
+
+  // 注册全局 logger 拦截器
+  const loggerService = app.get(LoggerService);
+  app.useGlobalInterceptors(new TransformInterceptor(loggerService));
+  // 注册全局错误的过滤器
+  app.useGlobalFilters(new HttpExceptionFilter(loggerService));
 
   await app.listen(3000);
 
