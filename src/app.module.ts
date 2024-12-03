@@ -14,6 +14,8 @@ import { RedisService } from './redis/redis.service';
 import { RedisModule } from './redis/redis.module';
 import { UploadModule } from './upload/upload.module';
 import { LoggerService } from './logger/logger.service';
+import { TimerService } from './timer/timer.service';
+import { TimerModule } from './timer/timer.module';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { LoggerService } from './logger/logger.service';
     AuthModule,
     RedisModule,
     UploadModule,
+    TimerModule,
   ],
   controllers: [AppController],
   // 注册为全局守卫
@@ -51,6 +54,7 @@ import { LoggerService } from './logger/logger.service';
     },
     RedisService,
     LoggerService,
+    TimerService,
   ],
 })
 export class AppModule {}

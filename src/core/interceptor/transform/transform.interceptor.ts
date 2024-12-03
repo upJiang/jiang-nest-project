@@ -39,13 +39,15 @@ export class TransformInterceptor implements NestInterceptor {
           responseTime: `${responseTime}ms`,
           statusCode: data?.statusCode || 200, // 默认 200 状态码
           code: 0,
-          msg: data.message || 'success',
+          msg: 'success',
         });
       }),
+
       map((data) => {
         return {
           code: 0,
-          msg: data.message || 'success',
+          msg: 'success',
+          data,
         };
       }),
     );

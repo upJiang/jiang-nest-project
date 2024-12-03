@@ -1,18 +1,16 @@
-> `nestjs` 作为前端儿最简单的后端入门语言，在如此卷的今天，掌握一门后端语言是非常有必要的。
-
-## 前言
-
-通过这篇文章，你将学会：
+本篇文章将带你彻底入门 `nestjs`，你将学会：
 
 - 使用 `typeorm` 连接数据库，实现简单的 `CRUD`，实现接口的统一格式，自动生成 `swagger` 文档
 - 通过 `docker` + `GITHUB ACTION` 自动化部署到腾讯云服务器上，并通过域名访问接口，真正实战落地
 - 使用 `JWT` 实现用户注册登录，身份验证（`token`）拦截返回 `401`
 - 学习 `redis` 数据库，在服务器上安装 `redis`，并在 `nest` 中落地使用
 - 通过 `Multer` 实现文件上传
+- 使用 `Winston` 保存日志
+- 使用 `@nestjs/schedule` 封装定时器
 
-[中文官方文档](https://www.itying.com/nestjs/article-index-id-108.html)，文章大部分都是基于腾讯云服务器实现的，系统是 `Linux CentOS`如果你没有服务器也可以选择本地数据库，也可以新购一台，想学习后端知识服务器肯定是必备的。`vscode` 需要安装插件 `Database Client`，`node` 版本选择高于 `20` 的，我的是 `20.9.0`。
+`nestjs` 基础知识可以参考 [中文官方文档](https://www.itying.com/nestjs/article-index-id-108.html)，文章关于服务器的知识都是基于腾讯云服务器实现的，系统是 `Linux CentOS`，如果你没有服务器也可以选择本地数据库，也可以新购一台，想学习后端知识服务器肯定是必备的。`VsCode` 需要安装插件 `Database Client`，`node` 版本选择高于 `20` 的，我的是 `20.9.0`。
 
-![1730876009691.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/da5483157f744a0493d4e0b886f65a71~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=g9IUHi6aruScck8vFY3xVf2eewk%3D)
+![1730876009691.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/da5483157f744a0493d4e0b886f65a71~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=6896xSNguFfa5g3iWWiBJIOQ1fE%3D)
 
 可以先行下载代码后阅读，[代码地址](https://github.com/upJiang/jiang-nest-project)，觉得还行的话希望能给仓库点个 `star `。下面开始动手吧！
 
@@ -33,7 +31,7 @@
 
 贴一下我的项目结构
 
-![1730876815124.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/3a3a4ae567d9413b82b38612b11ce0ea~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=BPxpd%2BRm4VJBR%2FHxB07VUcaqqUU%3D)
+![1730876815124.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/3a3a4ae567d9413b82b38612b11ce0ea~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=gIef8od3sU%2BgSVdm5jrqV9vfjO0%3D)
 
 在 `package.json` 中修改 `dev` 的命令，便于调试，可以实时监听代码修改
 
@@ -70,11 +68,11 @@
 
 - 在腾讯云服务器上新建一个数据库，并设置用户名跟密码，或者在本地安装数据库软件 `Navicat` 自行创建数据库
 
-![1730877884988.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/51b1b24db6d34106955c4945af64e961~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=WPFCNfEXEOf1cotSX04VpWS7YnI%3D)
+![1730877884988.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/51b1b24db6d34106955c4945af64e961~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=XonTp%2FT9ZvL5LiMTxrsADLgAu2I%3D)
 
 - 前面我让大家安装的 `Database Client`，这时候可以打开，自行连接数据库，后面我们都在这里直接看数据库的数据变化
 
-![1730889831874.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e0872dbc20f54e9c8d4955cc12cfb9fd~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=HbxmwePd0MV7DD%2BOv1vZqO0xhLU%3D)
+![1730889831874.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e0872dbc20f54e9c8d4955cc12cfb9fd~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=%2BW%2BAM9xWH03%2BTW6FEjmuTWk83Y0%3D)
 
 - 安装数据库相关的依赖
 
@@ -176,7 +174,7 @@
 
     nest g resource posts
 
-![1730889899478.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e5c00ec69c4e475ea9f3cd3524b5ed27~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=wnNfofge66fxVV2jCpeWcWbPARw%3D)
+![1730889899478.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e5c00ec69c4e475ea9f3cd3524b5ed27~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=3PMDtRAQMzQ0cQjqut75BWaFTJ0%3D)
 
 - `src/posts/entities/posts.entity.ts` ，熟悉 `ts` 的应该一看就懂了
 
@@ -432,13 +430,13 @@ export class PostsController {
 
 这时候我们执行 `yarn dev`，没有报错则前面步骤都很成功，然后我们打开本地软件 `Apifox` 或者 `Postman`，调用接口尝试
 
-![1730880123722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ab7b94b1cf094b05950928107fd12702~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=AfI1D3%2B3t3u1hRoWSlx30QwEkgE%3D)
+![1730880123722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ab7b94b1cf094b05950928107fd12702~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=50TX4bIdEocOPcN3qHO1IjbCNYU%3D)
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/07619ad363cd46738d56acf631991f59~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=YPFoVE31XGTgYBPyg5pNVbX0Ijo%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/07619ad363cd46738d56acf631991f59~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=kxsaccA18D1CNUQa0KG8Ub%2FvsxE%3D)
 
 可以看到，此时已经将数据插入到数据库对应表了
 
-![1730881253446.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/6a7ae3fb6b45490d928f5f9a25ef70d1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=O7g2GgQdWThKqHSJ3Dn8%2FNKTNgA%3D)
+![1730881253446.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/6a7ae3fb6b45490d928f5f9a25ef70d1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=7qfRX9tO5zK8fV165AZpPgJCyhk%3D)
 
 ## 接口返回统一格式
 
@@ -472,9 +470,6 @@ export class PostsController {
         const exceptionResponse: any = exception.getResponse();
         let validMessage = '';
 
-        for (let key in exception) {
-          console.log(key, exception[key]);
-        }
         if (typeof exceptionResponse === 'object') {
           validMessage =
             typeof exceptionResponse.message === 'string'
@@ -559,7 +554,7 @@ export class PostsController {
 
 至此接口返回的数据格式就统一了
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/bde643e30384467cba86d398def166ca~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=1xErcgBV%2Fyp%2B1YbqiN9%2F7xN4lGY%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/bde643e30384467cba86d398def166ca~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=%2BUo%2BLoD5Epqg6NUjShfA3VRun38%3D)
 
 ## 自动生成 swagger 接口文档
 
@@ -594,7 +589,7 @@ export class PostsController {
 
 - 配置完成，我们就可以访问：[文档地址](http://localhost:3000/docs)
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a5d5943f57b146168f2f8dd639ef60d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=D2IgMcbE%2FkaZV3aIu%2FHxKN5dRZ4%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a5d5943f57b146168f2f8dd639ef60d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=UR3vLiy0CKmeCEJeq%2FFtAJ3e25w%3D)
 
 这些描述需要我们分别在 `controller` 文件以及 `dto` 文件中添加注解
 
@@ -785,7 +780,7 @@ jobs:
 
 推送代码后就自动部署了，然后打开 <http://服务器ip:3000/docs>
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/65e9f9dcca974c36bd9865c4478bc68e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=Jx6709jlCxzl9GiUTkFq2U%2FRjK0%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/65e9f9dcca974c36bd9865c4478bc68e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=2PyOAuHf%2Bk7ZKujx9641CGwZBsw%3D)
 
 ## 配置域名访问接口地址
 
@@ -915,7 +910,7 @@ jobs:
 
 - 执行 `yarn dev`，数据已经创建好 `auth` 的表
 
-![1730886546270.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/305bf98a2c0f40c5aa461d318aaf30d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=43rGWtomjqKfV0p0l1fULbc2Bh8%3D)
+![1730886546270.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/305bf98a2c0f40c5aa461d318aaf30d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=Kx1DV1UPR242TNkpwYjA4GaW5sI%3D)
 
 - `auth.controller.ts`，编写登录注册方法
 
@@ -969,9 +964,9 @@ jobs:
 
 在 `apiFox` 测试接口 <http://127.0.0.1:3000/auth/signup>
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/dbd0ccc8299a4cbaad85fd268a8aa6e1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=jT%2FXjojy8IJMAZ3aj%2FNB%2B93F3RU%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/dbd0ccc8299a4cbaad85fd268a8aa6e1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=t8Tc2%2F2ho8zi2uNHF3585wQnpzw%3D)
 
-![1730886768337.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1a9dcf166b4d41aca482d7b7d3d52b3f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=NRpys3vqdxMuSqw%2F7dngwklPl2I%3D)
+![1730886768337.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1a9dcf166b4d41aca482d7b7d3d52b3f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=dwkRWqNBuBf5u%2B03TsLyvQWrTHA%3D)
 
 数据库已插入，接下来写 `jwt` 的逻辑
 
@@ -1187,7 +1182,7 @@ jobs:
 
 此时，请求注册接口 <http://127.0.0.1:3000/auth/signup，> 将会返回 401
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ff89832e463d4aefba3e24cf0d021ae4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=UFfBcYag1Q0EVs6RE5iOSumXaPI%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ff89832e463d4aefba3e24cf0d021ae4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=IiivizaS64AWG9aIGPzramrZsxg%3D)
 
 - 给通用接口(注册和登录接口)都加上 `@Public` 装饰器，绕过检测 `src/auth/auth.controller.ts`
 
@@ -1208,11 +1203,11 @@ jobs:
 
 至此，再次请求注册接口 <http://127.0.0.1:3000/auth/signup，> 就可以直接绕过 `token` 校验了
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/9a5642edf3c5499e8660cb46aa3b808d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=qYxqE6u0C%2FOwlHV05Fp7q2kIuBY%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/9a5642edf3c5499e8660cb46aa3b808d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=GS6ilwoeLQ%2Bg6r2lGOY4hwQjz5I%3D)
 
 在其它请求的 `Headers` 中添加登录返回的 `token` 可正常访问
 
-![企业微信截图_1731405334140.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/355e74e593f34be894f72f716e1f30fb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=HktqkoHwTx8wrnGjs%2FRqLON8DWw%3D)
+![企业微信截图_1731405334140.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/355e74e593f34be894f72f716e1f30fb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=0H4182IEe%2BJNAPkInfGryAG6u6Y%3D)
 
 ## 接入 redis
 
@@ -1353,7 +1348,7 @@ this.redisService.set(signupData.username, signupData.password);
 
 - 在插件 `Database` 中，连接 redis 数据库，用户名不用填写，其它正常填写，连接成功后，会发现多了一条刚刚注册的用户信息
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/2f91261c6799463ba8f8d176f987c2e5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=Hhklie%2BSbt0UjIRQ0o0KJ960xHg%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/2f91261c6799463ba8f8d176f987c2e5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=zrmtvfgf0YChVMCBJxAp2CZCQKA%3D)
 
 ## Multer 实现文件上传
 
@@ -1469,9 +1464,9 @@ this.redisService.set(signupData.username, signupData.password);
 
 ### 配置 `docker` 文件上传
 
-为了能够通过 `Docker` 容器将文件上传到宿主机（服务器文件系统），需要做以下操作
-
 > `NestJS` 项目打包到 `Docker` 容器 后，容器内的文件会存在于容器的文件系统中，而不是直接存在宿主机的某个文件夹。容器内无法直接访问宿主机的文件系统，只有通过卷挂载，才会同步到宿主机的指定路径。
+
+为了能够通过 `Docker` 容器将文件上传到宿主机（服务器文件系统），需要做以下操作
 
 - 在 `Dockerfile` 文件中添加挂载卷
 
@@ -1556,24 +1551,24 @@ this.redisService.set(signupData.username, signupData.password);
     # 查看容器映射
     $ docker inspect jiang-nest-study
 
-![1731482866817.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a0cde54e1ee845d69701073b36a3d3cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=MNhW6IdyE3x87zjpcr6b0AXUTvQ%3D)
+![1731482866817.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a0cde54e1ee845d69701073b36a3d3cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=vxbf7FeXZ1lUIck81sveMBf91dY%3D)
 
 当 `source` 跟 `Destination` 一致时则映射成功
 
 使用 `apiFox` 访问接口试试
 
-![1731495863066.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/661fa9c078974855bec1e5d03d49ae0a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=qfCBatzNBcM%2F2%2BuN5YcnzK3xgAs%3D)
+![1731495863066.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/661fa9c078974855bec1e5d03d49ae0a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=gtukCx5mXjIO6JZDaWHvY79Tkew%3D)
 在调用本地接口，返回的是前面设置的相对路径，接口已经把文件地址打印出来了，在生成的 `dist/uploads` 目录下也能看到上传的文件
 
-![1731495810377.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f80a5566abbe4268ba0a994c126ff358~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=tgIlucB6q07wJOxSAMRiIEEDeDI%3D)
+![1731495810377.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f80a5566abbe4268ba0a994c126ff358~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=kyGCJDQxdfZwTP4lh7BNB76onFo%3D)
 
 访问生产域名的上传文件
 
-![1731495913541.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/df22288405864fc29b8fbbfd2ba8c542~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=MxPM%2Fs0MNGfh0j%2FdnAyRLUJarGA%3D)
+![1731495913541.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/df22288405864fc29b8fbbfd2ba8c542~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=94nas3zrTyZixX6wDH2rayZcF3s%3D)
 
-![1731495957204.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/269d07e44c3e405c8a10096695776f3d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=9Sau3wkvL1l7JMtRUypghtQ2%2FSg%3D)
+![1731495957204.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/269d07e44c3e405c8a10096695776f3d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=g99dKT%2FO5DFhW811xbnSqBBE1h8%3D)
 
-![1731495970488.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cbf7731ea6024ff5a83a63b73d31dd9e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733731213&x-orig-sign=N%2B%2BcGLrnJas0w%2FBOm%2B2t6t35h88%3D)
+![1731495970488.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cbf7731ea6024ff5a83a63b73d31dd9e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=2uiyQ0fgJuBQv4n2x32MxrPD2XU%3D)
 
 也成功写入服务器的文件系统，并且正常访问了。至此文件上传搞定了！
 
@@ -1581,64 +1576,499 @@ this.redisService.set(signupData.username, signupData.password);
 
 > `Winston` 是一个功能强大且灵活的日志库，适用于 `Node.js` 环境。它能够记录应用程序的日志，并支持多种输出方式，例如控制台输出、文件、`HTTP`、数据库等。`Winston` 的设计目标是简洁、扩展性强，支持多种日志级别和格式化选项。
 
-安装依赖，`winston-daily-rotate-file`：按日期切割日志文件
+安装依赖
 
-```
-yarn add nest-winston winston winston-daily-rotate-file
-```
+    yarn add nest-winston winston winston-daily-rotate-file
 
 ### 创建一个日志服务（Logger Service）
 
-```
-nest generate service logger
-```
+    nest generate service logger
 
-创建一个 logger.service.ts 来配置 winston 日志记录器。
+创建日志配置器，使用 `winston` 中的 `transports` 格式化日志信息，使用 `winston-daily-rotate-file` 按日期切割日志文件，并且针对不同的日志类型做区分。会自动在项目根目录下新增 `logs/日期.log` 日志文件。
 
-```
-import { Injectable } from '@nestjs/common';
-import * as winston from 'winston';
-import 'winston-daily-rotate-file';
+    import { Injectable } from '@nestjs/common';
+    import { createLogger, transports, format, Logger } from 'winston';
+    import 'winston-daily-rotate-file';
 
-@Injectable()
-export class LoggerService {
-  private logger: winston.Logger;
+    @Injectable()
+    export class LoggerService {
+      private logger: Logger;
 
-  constructor() {
-    this.logger = winston.createLogger({
-      level: 'info',
-      transports: [
-        new winston.transports.Console({
-          format: winston.format.combine(
-            winston.format.colorize(),
-            winston.format.simple(),
+      constructor() {
+        this.logger = createLogger({
+          level: 'info', // 默认日志级别
+          format: format.combine(
+            format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), // 设置时间戳格式
+            format.printf(({ timestamp, level, message, ...metadata }) => {
+              // 确保时间戳在日志的最前面，并且处理 metadata（如 params）
+              let logMessage = `${timestamp} [${level}] : ${message}`;
+
+              // 如果有 metadata（附加的对象），将它们格式化为 JSON
+              if (Object.keys(metadata).length > 0) {
+                if (metadata.message !== 'message') {
+                  logMessage += ` | ${JSON.stringify(metadata, null, 2)}`;
+                }
+              }
+              return logMessage;
+            }),
           ),
-        }),
-        new winston.transports.DailyRotateFile({
-          filename: 'logs/%DATE%-log.log',
-          datePattern: 'YYYY-MM-DD',
-          zippedArchive: true,
-          maxSize: '20m',
-          maxFiles: '14d',
-        }),
-      ],
-    });
-  }
+          transports: [
+            // 控制台输出
+            new transports.Console({
+              format: format.combine(
+                format.colorize(), // 颜色化输出
+                format.simple(), // 简单格式
+              ),
+            }),
+            // 使用 daily-rotate-file 来实现按日期生成不同日志文件
+            new transports.DailyRotateFile({
+              filename: 'logs/%DATE%.log', // 文件名中包含日期
+              datePattern: 'YYYY-MM-DD', // 设置日期格式
+              maxFiles: '7d', // 保留最近 7 天的日志文件
+              level: 'info', // 日志级别为 info
+              format: format.combine(
+                format.timestamp({
+                  format: 'YYYY-MM-DD HH:mm:ss',
+                }),
+                format.printf((info) => {
+                  const paramsInfo = JSON.parse(JSON.stringify(info));
+                  // 避免 message 字段在日志中作为 key 出现
+                  delete paramsInfo.message;
+                  return `${info.timestamp} [${info.level}] : ${info.message} ${
+                    Object.keys(info).length
+                      ? JSON.stringify(paramsInfo, null, 2)
+                      : ''
+                  }`;
+                }),
+              ),
+            }),
+          ],
+        });
+      }
 
-  log(message: string) {
-    this.logger.info(message);
-  }
+      log(message: string, params: object = {}) {
+        if (typeof params === 'object' && Object.keys(params).length > 0) {
+          // 如果 params 对象存在，则将日志以自定义格式输出
+          const logMessage = {
+            message,
+            ...params,
+            level: 'info', // 设定日志级别为 info
+          };
+          this.logger.info(logMessage);
+        } else {
+          this.logger.info(message);
+        }
+      }
 
-  error(message: string, trace: string) {
-    this.logger.error(`${message} - ${trace}`);
-  }
+      error(message: string, params: object = {}, trace: string = '') {
+        if (typeof params === 'object' && Object.keys(params).length > 0) {
+          // 如果 params 对象存在，则将日志以自定义格式输出
+          const logMessage = {
+            message,
+            ...params,
+            level: 'error', // 设定日志级别为 error
+            trace, // 如果有异常堆栈信息，可以添加到日志中
+          };
+          this.logger.error(logMessage);
+        } else {
+          this.logger.error(message);
+        }
+      }
 
-  warn(message: string) {
-    this.logger.warn(message);
-  }
+      warn(message: string, params: object = {}) {
+        if (typeof params === 'object' && Object.keys(params).length > 0) {
+          // 如果 params 对象存在，则将日志以自定义格式输出
+          const logMessage = {
+            message,
+            ...params,
+            level: 'warn', // 设定日志级别为 warn
+          };
+          this.logger.warn(logMessage);
+        } else {
+          this.logger.warn(message);
+        }
+      }
 
-  // Add other methods like debug, verbose, etc., if needed
-}
-```
+      debug(message: string, params: object = {}) {
+        if (typeof params === 'object' && Object.keys(params).length > 0) {
+          // 如果 params 对象存在，则将日志以自定义格式输出
+          const logMessage = {
+            message,
+            ...params,
+            level: 'debug', // 设定日志级别为 debug
+          };
+          this.logger.debug(logMessage);
+        } else {
+          this.logger.debug(message);
+        }
+      }
 
-至此，你也入门 `nestjs` 了，真棒，能够看到这里相信你一定有所收获，觉得不错可以给文章点个赞\~
+      info(message: string, params: object = {}) {
+        if (typeof params === 'object' && Object.keys(params).length > 0) {
+          // 如果 params 对象存在，则将日志以自定义格式输出
+          const logMessage = {
+            message,
+            ...params,
+            level: 'info', // 设定日志级别为 info
+          };
+          this.logger.info(logMessage);
+        } else {
+          this.logger.info(message);
+        }
+      }
+    }
+
+### 修改接口过滤器、拦截器，打印日志
+
+在前面创建的接口过滤器、拦截器中，我们新增全局打印接口日志的操作
+
+- 在 main.ts 中注册 `Logger Service`，并将 `loggerService` 传入到接口过滤器、拦截器中
+
+<!---->
+
+    import { LoggerService } from './logger/logger.service';
+
+    // 注册全局 logger 拦截器
+    const loggerService = app.get(LoggerService);
+    app.useGlobalInterceptors(new TransformInterceptor(loggerService));
+    // 注册全局错误的过滤器
+    app.useGlobalFilters(new HttpExceptionFilter(loggerService));
+
+- 修改接口过滤器文件内容，打印请求错误日志内容，需要打印的内容可以自行定制
+
+`/src/core/filter/http-exception/http-exception.filter.ts`
+
+    import {
+      ArgumentsHost,
+      Catch,
+      ExceptionFilter,
+      HttpException,
+    } from '@nestjs/common';
+    import { LoggerService } from '../../../logger/logger.service';
+
+    @Catch(HttpException)
+    export class HttpExceptionFilter implements ExceptionFilter {
+      constructor(private readonly logger: LoggerService) {} // 注入 LoggerService
+
+      catch(exception: HttpException, host: ArgumentsHost) {
+        const ctx = host.switchToHttp(); // 获取请求上下文
+        const response = ctx.getResponse(); // 获取请求上下文中的 response对象
+        const request = ctx.getRequest(); // 获取请求上下文中的 request 对象
+        const status = exception.getStatus(); // 获取异常状态码
+        const exceptionResponse: any = exception.getResponse();
+
+        // 获取请求的更多信息
+        const { method, url, params, query, body, headers } = request;
+
+        let validMessage = '';
+
+        if (typeof exceptionResponse === 'object') {
+          validMessage =
+            typeof exceptionResponse.message === 'string'
+              ? exceptionResponse.message
+              : exceptionResponse.message[0];
+        }
+        const message = exception.message
+          ? exception.message
+          : `${status >= 500 ? 'Service Error' : 'Client Error'}`;
+
+        const errorResponse = {
+          code: -1,
+          msg: validMessage || message,
+        };
+
+        // 设置返回的状态码， 请求头，发送错误信息
+        response.status(status);
+        response.header('Content-Type', 'application/json; charset=utf-8');
+        response.send(errorResponse);
+
+        // 记录请求信息
+        this.logger.log('请求信息:', {
+          url,
+          method,
+          headers,
+          body,
+          query,
+          params,
+        });
+
+        // 记录请求的响应时间和状态
+        this.logger.log('响应信息:', {
+          url,
+          method,
+          statusCode: status,
+          msg: validMessage || message,
+          ...errorResponse,
+        });
+      }
+    }
+
+- 修改接口拦截器文件内容，打印请求成功日志内容，需要打印的内容可以自行定制
+
+`/src/core/interceptor/transform/transform.interceptor.ts`
+
+    import {
+      CallHandler,
+      ExecutionContext,
+      Injectable,
+      NestInterceptor,
+    } from '@nestjs/common';
+    import { map, Observable, tap } from 'rxjs';
+    import { LoggerService } from '../../../logger/logger.service';
+
+    @Injectable()
+    export class TransformInterceptor implements NestInterceptor {
+      constructor(private readonly logger: LoggerService) {}
+
+      intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+        const now = Date.now();
+        const request = context.switchToHttp().getRequest();
+        const { method, url, headers, body, query, params } = request;
+
+        // 记录请求的基本信息
+        this.logger.log('请求信息:', {
+          url,
+          method,
+          headers,
+          body,
+          query,
+          params,
+          message: '请求信息',
+        });
+
+        return next.handle().pipe(
+          tap((data) => {
+            // 记录响应时间
+            const responseTime = Date.now() - now;
+
+            // 记录请求的响应时间和状态
+            this.logger.log('响应信息:', {
+              url,
+              method,
+              responseTime: `${responseTime}ms`,
+              statusCode: data?.statusCode || 200, // 默认 200 状态码
+              code: 0,
+              msg: 'success',
+            });
+          }),
+
+          map((data) => {
+            return {
+              code: 0,
+              msg: 'success',
+              data,
+            };
+          }),
+        );
+      }
+    }
+
+- 尝试请求失败的接口，可以看到日志已经成功按照我们想要的格式打印到日志文件中。
+
+![企业微信截图_17331365008842.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1c2378b979af4adab54ce3488ba45a78~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=%2Fnw3cePsc1nMpaIH3oc%2B23qEL8E%3D)
+
+查看本地打印以及日志文件内容
+
+![企业微信截图_1733136636853.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ae695a11aaa548fabec11cd62be7c3a4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=n9EbJdDIIVu%2Be3%2BHQ4z8CTQ1HcY%3D)
+
+![企业微信截图_17331366661836.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f50ceaa9f2b24f479ee6a22d0176f6d4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=m%2Bk0NG5OzMZpxQMB4mgP9gcrX8Y%3D)
+
+- 再尝试请求成功的接口
+
+![企业微信截图_17331367812242.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a8518aabe74a4e50a55a9e24b5020158~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=ZtJcP9jodA67I9mDa24frLJ7354%3D)
+
+查看本地打印以及日志文件内容，也是没问题的。
+
+![企业微信截图_17331368324588.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/fb01129fb02b4859928f4c1159cb1a34~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=iEcn1v%2BXm%2FXi4B1GPpeAviMZgt8%3D)
+
+![企业微信截图_17331368601722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f22073519d5549a890068de1321ebbf0~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=35csHJpyX8nGbOludMV9y23jy2s%3D)
+
+至此日志也完成啦\~
+
+## 定时器 @nestjs/schedule
+
+我们使用 `@nestjs/schedule` 模块来创建定时任务。该模块提供了许多方便的方法来安排和管理定时任务，比如 `cron` 表达式或延迟任务。
+
+[@nestjs/schedule 官方文档](https://docs.nestjs.com/techniques/task-scheduling)，更多的 `Cron` 表达式 使用方法请参考官方文档
+
+安装依赖
+
+    yarn add @nestjs/schedule
+
+### 封装定时器模块
+
+    nest g resource timer
+
+- 封装一个定时器 `Service`，以便于其它模块更方便的创建、使用、销毁定时器
+
+`src/time/timer.service.ts`
+
+    import { Injectable } from '@nestjs/common';
+    import { SchedulerRegistry } from '@nestjs/schedule';
+    import { CronJob } from 'cron'; // 从 cron 包导入 CronJob 类
+
+    /**
+     * 定时器服务，用于管理定时任务。
+     */
+    @Injectable()
+    export class TimerService {
+      constructor(private schedulerRegistry: SchedulerRegistry) {}
+
+      /**
+       * 添加自定义 Cron 定时任务。
+       *
+       * @param name 任务名称，用于标识定时任务
+       * @param cronExpression Cron 表达式，定义任务执行的时间和频率
+       * @param callback 定时任务触发时调用的回调函数
+       */
+      addCronJob(name: string, cronExpression: string, callback: () => void) {
+        const job = new CronJob(cronExpression, callback); // 使用 CronJob 来创建定时任务
+        this.schedulerRegistry.addCronJob(name, job);
+        job.start();
+        return `定时任务 ${name} 已启动`;
+      }
+
+      /**
+       * 停止指定的 Cron 定时任务。
+       *
+       * @param name 任务名称
+       */
+      stopCronJob(name: string) {
+        try {
+          const job = this.schedulerRegistry.getCronJob(name);
+          job.stop();
+          return '定时任务已停止';
+        } catch (error) {
+          return '找不到该定时任务，或者已被停止';
+        }
+      }
+
+      /**
+       * 添加延时任务（Timeout）。
+       *
+       * @param name 任务名称
+       * @param delay 延时的时间，单位为毫秒
+       * @param callback 延时结束后调用的回调函数
+       */
+      addTimeout(name: string, delay: number, callback: () => void) {
+        const timeout = setTimeout(callback, delay);
+        this.schedulerRegistry.addTimeout(name, timeout);
+        return '`延时任务 ${name} 已启动`';
+      }
+
+      /**
+       * 停止指定的延时任务（Timeout）。
+       *
+       * @param name 任务名称
+       */
+      stopTimeout(name: string) {
+        try {
+          const timeout = this.schedulerRegistry.getTimeout(name);
+          if (timeout) {
+            clearTimeout(timeout);
+            return `延时任务 ${name} 已停止`;
+          } else {
+            return `延时任务 ${name} 不存在`;
+          }
+        } catch (error) {
+          return '找不到该延时任务，或者已被停止';
+        }
+      }
+
+      /**
+       * 添加间隔任务（Interval）。
+       *
+       * @param name 任务名称
+       * @param interval 间隔时间，单位为毫秒
+       * @param callback 间隔时间到达后调用的回调函数
+       */
+      addInterval(name: string, interval: number, callback: () => void) {
+        const intervalId = setInterval(callback, interval);
+        this.schedulerRegistry.addInterval(name, intervalId);
+        return `间隔任务 ${name} 已启动`;
+      }
+
+      /**
+       * 停止指定的间隔任务（Interval）。
+       *
+       * @param name 任务名称
+       */
+      stopInterval(name: string) {
+        try {
+          const intervalId = this.schedulerRegistry.getInterval(name);
+          if (intervalId) {
+            clearInterval(intervalId);
+            return `间隔任务 ${name} 已停止`;
+          } else {
+            return `间隔任务 ${name} 不存在`;
+          }
+        } catch (error) {
+          return '找不到该间隔任务，或者已被停止';
+        }
+      }
+    }
+
+- 配置一下必填项 `src/timer/dto/create-timer.dto.ts`
+
+<!---->
+
+    import { ApiProperty } from '@nestjs/swagger';
+    import { IsNotEmpty } from 'class-validator';
+
+    export class CreateTimerDto {
+      @ApiProperty({ description: '定时器名称' })
+      @IsNotEmpty({ message: '定时器名称必填' })
+      name: string;
+    }
+
+- 在 `timer.controller.ts` 中写个方法尝试启动定时器与销毁定时器
+
+<!---->
+
+    import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+    import { ApiOperation, ApiTags } from '@nestjs/swagger';
+    import { TimerService } from './timer.service';
+    import { Public } from 'src/common/public.decorator';
+    import { CreateTimerDto } from './dto/create-timer.dto';
+
+    @ApiTags('定时器')
+    @Controller('timer')
+    export class TimerController {
+      constructor(private readonly timerService: TimerService) {}
+
+      /**
+       * 尝试定时任务
+       * @param post
+       */
+      @Public()
+      @ApiOperation({ summary: '开启定时任务' })
+      @Post('/start-timer')
+      async create(@Body() post: CreateTimerDto) {
+        return this.timerService.addCronJob(post.name, '*/5 * * * * *', () => {
+          console.log('定时任务已启动，每五秒执行一次');
+        });
+      }
+
+      /**
+       * 手动停止 Cron 定时任务
+       * @param post
+       */
+      @Public()
+      @ApiOperation({ summary: '手动停止 Cron 定时任务' })
+      @Get('/stop-timer/:name')
+      async stopTimer(@Param('name') name: string) {
+        return this.timerService.stopCronJob(name);
+      }
+    }
+
+- 在 `apifox` 中调用 `/timer/start-timer`，在控制台可以看到每隔 5 秒就会执行一次
+
+![企业微信截图_173322520991.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/8766c83ada5946b49cef965f91a94d7f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=ueLxqugnnql4Ehs2wfPaRhxcE9E%3D)
+
+![企业微信截图_17332252539480.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e72063bf046949e096eb19345982c7e8~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=IoJwt5lXQwJP4sSvR%2F6f9M4Mnkk%3D)
+
+- 销毁定时器，调用后定时器不再执行
+
+![企业微信截图_17332252992784.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/14e115a5356c45eb8e105f8e5820a2a4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=nNReC%2FxcABCqF%2BV3zzmCz%2FP4%2FE8%3D)
+
+好了，你已经成功入门 `nestjs` 了，真棒，能够看到这里相信你一定有所收获，觉得不错可以给文章点个赞\~
