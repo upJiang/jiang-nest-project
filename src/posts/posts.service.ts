@@ -1,11 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PostsEntity } from './entities/posts.entity';
 
 export interface PostsRo {
   list: PostsEntity[];
   count: number;
+  totalPages: number;
+  currentPage: number;
 }
 @Injectable()
 export class PostsService {
@@ -28,18 +30,19 @@ export class PostsService {
   }
 
   // 获取文章列表
-  async findAll(query): Promise<PostsRo> {
-    const qb = await getRepository(PostsEntity).createQueryBuilder('post');
-    qb.where('1 = 1');
-    qb.orderBy('post.create_time', 'DESC');
+  async findAll(page: number = 1, pageSize: number = 10): Promise<PostsRo> {
+    const [posts, totalCount] = await this.postsRepository.findAndCount({
+      skip: (page - 1) * pageSize, // 分页偏移量
+      take: pageSize, // 每页显示的记录数
+      order: { create_time: 'DESC' },
+    });
 
-    const count = await qb.getCount();
-    const { pageNum = 1, pageSize = 10, ...params } = query;
-    qb.limit(pageSize);
-    qb.offset(pageSize * (pageNum - 1));
-
-    const posts = await qb.getMany();
-    return { list: posts, count: count };
+    return {
+      list: posts,
+      count: totalCount,
+      totalPages: Math.ceil(totalCount / pageSize), // 计算总页数
+      currentPage: page, // 当前页
+    };
   }
 
   // 获取指定文章
