@@ -31,6 +31,12 @@ jobs:
     needs: build
 
     steps:
+      - name: Debug SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/private_key
+          chmod 600 ~/.ssh/private_key
+          ssh-keygen -l -f ~/.ssh/private_key || echo "Invalid key format"
       - name: SSH to server and deploy
         uses: appleboy/ssh-action@v0.1.6
         with:
@@ -52,6 +58,10 @@ jobs:
             docker ps -q --filter "publish=3000" | grep -q . && \
               docker ps -q --filter "publish=3000" | xargs -I {} docker stop {} && \
               docker ps -a -q --filter "publish=3000" | xargs -I {} docker rm {} || echo "Port 3000 is not occupied"
+
+            # 启动 Docker Compose 
+            docker-compose down # 确保旧容器被停止并删除
+            docker-compose up -d --build # 使用 Docker Compose 启动新容器
 
             # 运行新容器并挂载卷
             docker run -d --name jiang-nest-study -p 3000:3000 -v /www/wwwroot/blog.junfeng530.xyz/uploads:/www/wwwroot/blog.junfeng530.xyz/uploads registry.cn-shenzhen.aliyuncs.com/jiang-nest/jiang-nest-study:latest
