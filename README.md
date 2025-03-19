@@ -1,4 +1,8 @@
-本篇文章将带你彻底入门 `nestjs`，你将学会：
+---
+theme: condensed-night-purple
+---
+
+`本篇文章将带你彻底入门` `nestjs`，你将学会：
 
 - 使用 `typeorm` 连接数据库，实现简单的 `CRUD`，实现接口的统一格式，自动生成 `swagger` 文档
 - 通过 `docker` + `GITHUB ACTION` 自动化部署到腾讯云服务器上，并通过域名访问接口，真正实战落地
@@ -10,7 +14,7 @@
 
 `nestjs` 基础知识可以参考 [中文官方文档](https://www.itying.com/nestjs/article-index-id-108.html)，文章关于服务器的知识都是基于腾讯云服务器实现的，系统是 `Linux CentOS`，如果你没有服务器也可以选择本地数据库，也可以新购一台，想学习后端知识服务器肯定是必备的。`VsCode` 需要安装插件 `Database Client`，`node` 版本选择高于 `20` 的，我的是 `20.9.0`。
 
-![1730876009691.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/da5483157f744a0493d4e0b886f65a71~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=6896xSNguFfa5g3iWWiBJIOQ1fE%3D)
+![1730876009691.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/da5483157f744a0493d4e0b886f65a71~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=5VSDNowkuT2hM%2Bo3KkY8ErsXJ1Y%3D)
 
 可以先行下载代码后阅读，[代码地址](https://github.com/upJiang/jiang-nest-project)，觉得还行的话希望能给仓库点个 `star `。下面开始动手吧！
 
@@ -31,7 +35,7 @@
 
 贴一下我的项目结构
 
-![1730876815124.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/3a3a4ae567d9413b82b38612b11ce0ea~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=gIef8od3sU%2BgSVdm5jrqV9vfjO0%3D)
+![1730876815124.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/3a3a4ae567d9413b82b38612b11ce0ea~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=jYfGhnmxPunJcwY7TL2ZFCwPWhs%3D)
 
 在 `package.json` 中修改 `dev` 的命令，便于调试，可以实时监听代码修改
 
@@ -68,11 +72,11 @@
 
 - 在腾讯云服务器上新建一个数据库，并设置用户名跟密码，或者在本地安装数据库软件 `Navicat` 自行创建数据库
 
-![1730877884988.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/51b1b24db6d34106955c4945af64e961~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=XonTp%2FT9ZvL5LiMTxrsADLgAu2I%3D)
+![1730877884988.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/51b1b24db6d34106955c4945af64e961~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=5SHaPH3lPVG%2FJF7Io039wZze7zA%3D)
 
 - 前面我让大家安装的 `Database Client`，这时候可以打开，自行连接数据库，后面我们都在这里直接看数据库的数据变化
 
-![1730889831874.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e0872dbc20f54e9c8d4955cc12cfb9fd~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=%2BW%2BAM9xWH03%2BTW6FEjmuTWk83Y0%3D)
+![1730889831874.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e0872dbc20f54e9c8d4955cc12cfb9fd~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=Bzd%2BWdMyv1A6EteUUEu1zTWIZ%2FI%3D)
 
 - 安装数据库相关的依赖
 
@@ -174,7 +178,7 @@
 
     nest g resource posts
 
-![1730889899478.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e5c00ec69c4e475ea9f3cd3524b5ed27~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=3PMDtRAQMzQ0cQjqut75BWaFTJ0%3D)
+![1730889899478.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e5c00ec69c4e475ea9f3cd3524b5ed27~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=8ARwwGwG%2BYBKMiqrc%2FFyRxAsYBQ%3D)
 
 - `src/posts/entities/posts.entity.ts` ，熟悉 `ts` 的应该一看就懂了
 
@@ -224,6 +228,8 @@
     export interface PostsRo {
       list: PostsEntity[];
       count: number;
+      totalPages: number;
+      currentPage: number;
     }
     @Injectable()
     export class PostsService {
@@ -245,19 +251,21 @@
         return await this.postsRepository.save(post);
       }
 
+
       // 获取文章列表
-      async findAll(query): Promise<PostsRo> {
-        const qb = await getRepository(PostsEntity).createQueryBuilder('post');
-        qb.where('1 = 1');
-        qb.orderBy('post.create_time', 'DESC');
+      async findAll(page: number = 1, pageSize: number = 10): Promise<PostsRo> {
+        const [posts, totalCount] = await this.postsRepository.findAndCount({
+          skip: (page - 1) * pageSize, // 分页偏移量
+          take: pageSize, // 每页显示的记录数
+          order: { create_time: 'DESC' },
+        });
 
-        const count = await qb.getCount();
-        const { pageNum = 1, pageSize = 10, ...params } = query;
-        qb.limit(pageSize);
-        qb.offset(pageSize * (pageNum - 1));
-
-        const posts = await qb.getMany();
-        return { list: posts, count: count };
+        return {
+          list: posts,
+          count: totalCount,
+          totalPages: Math.ceil(totalCount / pageSize), // 计算总页数
+          currentPage: page, // 当前页
+        };
       }
 
       // 获取指定文章
@@ -430,13 +438,13 @@ export class PostsController {
 
 这时候我们执行 `yarn dev`，没有报错则前面步骤都很成功，然后我们打开本地软件 `Apifox` 或者 `Postman`，调用接口尝试
 
-![1730880123722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ab7b94b1cf094b05950928107fd12702~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=50TX4bIdEocOPcN3qHO1IjbCNYU%3D)
+![1730880123722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ab7b94b1cf094b05950928107fd12702~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=SguoNVk3n%2FZ%2BDacKCptQZON%2FeiA%3D)
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/07619ad363cd46738d56acf631991f59~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=kxsaccA18D1CNUQa0KG8Ub%2FvsxE%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/07619ad363cd46738d56acf631991f59~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=P5lNmu7BcKN6l39dLWGYcmBfBvk%3D)
 
 可以看到，此时已经将数据插入到数据库对应表了
 
-![1730881253446.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/6a7ae3fb6b45490d928f5f9a25ef70d1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=7qfRX9tO5zK8fV165AZpPgJCyhk%3D)
+![1730881253446.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/6a7ae3fb6b45490d928f5f9a25ef70d1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=eGf0sPaLnAAbCuSWm4zhus1AsFk%3D)
 
 ## 接口返回统一格式
 
@@ -554,7 +562,7 @@ export class PostsController {
 
 至此接口返回的数据格式就统一了
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/bde643e30384467cba86d398def166ca~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=%2BUo%2BLoD5Epqg6NUjShfA3VRun38%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/bde643e30384467cba86d398def166ca~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=6RLg97lqLTj3FyiNCW%2FPUf2niRo%3D)
 
 ## 自动生成 swagger 接口文档
 
@@ -589,7 +597,7 @@ export class PostsController {
 
 - 配置完成，我们就可以访问：[文档地址](http://localhost:3000/docs)
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a5d5943f57b146168f2f8dd639ef60d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=UR3vLiy0CKmeCEJeq%2FFtAJ3e25w%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a5d5943f57b146168f2f8dd639ef60d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=XPqorNecmYT9pQww%2B%2BkmfaoIYWI%3D)
 
 这些描述需要我们分别在 `controller` 文件以及 `dto` 文件中添加注解
 
@@ -672,6 +680,13 @@ export class CreatePostDto {
 
 ```
 
+在 `src/main.ts` 中注册全局管道
+
+    import { ValidationPipe } from '@nestjs/common';
+
+    // 注册全局管道
+    app.useGlobalPipes(new ValidationPipe());
+
 刷新文档地址就会生效了，少传作者信息也会报错了
 
     {
@@ -719,11 +734,24 @@ CMD ["yarn", "start"]
 
 - 在 `Github` 仓库中的新建 5 个 `Repository secrets`
 
-  - `SERVER_HOST`：服务器 ip
-  - `SERVER_USERNAME`：服务器登录用户名， 一般 `root`
-  - `SERVER_SSH_KEY`：`Github` 的私钥，服务器需要要生成相对应的公钥，这里不会的可以参考我的 过去文章
-  - `ALIYUN_DOCKER_USERNAME`：阿里云 `Docker` 用户名
-  - `ALIYUN_DOCKER_PASSWORD`：阿里云 `Docker` 密码
+<!---->
+
+- SERVER_HOST：服务器 ip
+- SERVER_USERNAME：服务器登录用户名，一般 root
+- SERVER_SSH_KEY：
+  - 在本地生成 `ssh` 密钥对
+  ```bash
+  ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+  ```
+  - 将私钥添加到 `Github` 仓库的 `Repository secrets` 中，命名为 `SERVER_SSH_KEY`
+  - 将公钥添加到服务器的 \~/.ssh/authorized_keys 文件中
+  ```bash
+  echo "前面生成的公钥内容.pub" >> ~/.ssh/authorized_keys
+  ```
+- ALIYUN_DOCKER_USERNAME：阿里云 Docker 用户名
+- ALIYUN_DOCKER_PASSWORD：阿里云 Docker 密码
+
+<!---->
 
 - 新增 `.github/workflows/deploy.yml`
 
@@ -780,7 +808,7 @@ jobs:
 
 推送代码后就自动部署了，然后打开 <http://服务器ip:3000/docs>
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/65e9f9dcca974c36bd9865c4478bc68e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=2PyOAuHf%2Bk7ZKujx9641CGwZBsw%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/65e9f9dcca974c36bd9865c4478bc68e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=yJ0j78TxiTKU1bVOR1R4%2Fqp83TQ%3D)
 
 ## 配置域名访问接口地址
 
@@ -910,7 +938,7 @@ jobs:
 
 - 执行 `yarn dev`，数据已经创建好 `auth` 的表
 
-![1730886546270.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/305bf98a2c0f40c5aa461d318aaf30d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=Kx1DV1UPR242TNkpwYjA4GaW5sI%3D)
+![1730886546270.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/305bf98a2c0f40c5aa461d318aaf30d5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=LqjuSCAfGXXkU4olVPEZPxJPQDk%3D)
 
 - `auth.controller.ts`，编写登录注册方法
 
@@ -964,9 +992,9 @@ jobs:
 
 在 `apiFox` 测试接口 <http://127.0.0.1:3000/auth/signup>
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/dbd0ccc8299a4cbaad85fd268a8aa6e1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=t8Tc2%2F2ho8zi2uNHF3585wQnpzw%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/dbd0ccc8299a4cbaad85fd268a8aa6e1~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=yPMpcS6MjENS5wOCp7t2ghuGhms%3D)
 
-![1730886768337.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1a9dcf166b4d41aca482d7b7d3d52b3f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=dwkRWqNBuBf5u%2B03TsLyvQWrTHA%3D)
+![1730886768337.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1a9dcf166b4d41aca482d7b7d3d52b3f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=hdRojY5JJFP2oWOUxejKnSwyjH0%3D)
 
 数据库已插入，接下来写 `jwt` 的逻辑
 
@@ -1182,7 +1210,7 @@ jobs:
 
 此时，请求注册接口 <http://127.0.0.1:3000/auth/signup，> 将会返回 401
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ff89832e463d4aefba3e24cf0d021ae4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=IiivizaS64AWG9aIGPzramrZsxg%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ff89832e463d4aefba3e24cf0d021ae4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=%2BriMtBfs9Z%2FHOMr8QyvkHhqEgkA%3D)
 
 - 给通用接口(注册和登录接口)都加上 `@Public` 装饰器，绕过检测 `src/auth/auth.controller.ts`
 
@@ -1203,11 +1231,11 @@ jobs:
 
 至此，再次请求注册接口 <http://127.0.0.1:3000/auth/signup，> 就可以直接绕过 `token` 校验了
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/9a5642edf3c5499e8660cb46aa3b808d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=GS6ilwoeLQ%2Bg6r2lGOY4hwQjz5I%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/9a5642edf3c5499e8660cb46aa3b808d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=dlZ%2BXm%2F8%2FR3XZUTPBsf4KMqND%2B4%3D)
 
 在其它请求的 `Headers` 中添加登录返回的 `token` 可正常访问
 
-![企业微信截图_1731405334140.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/355e74e593f34be894f72f716e1f30fb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=0H4182IEe%2BJNAPkInfGryAG6u6Y%3D)
+![企业微信截图_1731405334140.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/355e74e593f34be894f72f716e1f30fb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=M%2FqWH9SGFkTS%2Fr9eyu0BNoS%2FyDE%3D)
 
 ## 接入 redis
 
@@ -1348,7 +1376,7 @@ this.redisService.set(signupData.username, signupData.password);
 
 - 在插件 `Database` 中，连接 redis 数据库，用户名不用填写，其它正常填写，连接成功后，会发现多了一条刚刚注册的用户信息
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/2f91261c6799463ba8f8d176f987c2e5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=zrmtvfgf0YChVMCBJxAp2CZCQKA%3D)
+![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/2f91261c6799463ba8f8d176f987c2e5~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=FanIoxVBulLHy4HNsG0D8L5LYRs%3D)
 
 ## Multer 实现文件上传
 
@@ -1551,24 +1579,24 @@ this.redisService.set(signupData.username, signupData.password);
     # 查看容器映射
     $ docker inspect jiang-nest-study
 
-![1731482866817.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a0cde54e1ee845d69701073b36a3d3cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=vxbf7FeXZ1lUIck81sveMBf91dY%3D)
+![1731482866817.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a0cde54e1ee845d69701073b36a3d3cb~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=9sVEKYzL5j1IAD0%2F3UQdW2T%2FkpQ%3D)
 
 当 `source` 跟 `Destination` 一致时则映射成功
 
 使用 `apiFox` 访问接口试试
 
-![1731495863066.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/661fa9c078974855bec1e5d03d49ae0a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=gtukCx5mXjIO6JZDaWHvY79Tkew%3D)
+![1731495863066.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/661fa9c078974855bec1e5d03d49ae0a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=YvYtxmF%2Bj8OncVBBOCN254O%2F2vw%3D)
 在调用本地接口，返回的是前面设置的相对路径，接口已经把文件地址打印出来了，在生成的 `dist/uploads` 目录下也能看到上传的文件
 
-![1731495810377.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f80a5566abbe4268ba0a994c126ff358~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=kyGCJDQxdfZwTP4lh7BNB76onFo%3D)
+![1731495810377.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f80a5566abbe4268ba0a994c126ff358~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=MdYg8enkJyfeOLRTd5zEir7f1po%3D)
 
 访问生产域名的上传文件
 
-![1731495913541.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/df22288405864fc29b8fbbfd2ba8c542~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=94nas3zrTyZixX6wDH2rayZcF3s%3D)
+![1731495913541.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/df22288405864fc29b8fbbfd2ba8c542~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=iWSn5jKqqM0O9DHU6RTjbsRWR1I%3D)
 
-![1731495957204.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/269d07e44c3e405c8a10096695776f3d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=g99dKT%2FO5DFhW811xbnSqBBE1h8%3D)
+![1731495957204.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/269d07e44c3e405c8a10096695776f3d~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=GgDRV6PeI%2BxZQHim9J0pQEGOZcw%3D)
 
-![1731495970488.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cbf7731ea6024ff5a83a63b73d31dd9e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=2uiyQ0fgJuBQv4n2x32MxrPD2XU%3D)
+![1731495970488.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/cbf7731ea6024ff5a83a63b73d31dd9e~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=0as8PNzQyP1QbYGLHQXV40Sip8Q%3D)
 
 也成功写入服务器的文件系统，并且正常访问了。至此文件上传搞定了！
 
@@ -1865,23 +1893,23 @@ this.redisService.set(signupData.username, signupData.password);
 
 - 尝试请求失败的接口，可以看到日志已经成功按照我们想要的格式打印到日志文件中。
 
-![企业微信截图_17331365008842.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1c2378b979af4adab54ce3488ba45a78~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=%2Fnw3cePsc1nMpaIH3oc%2B23qEL8E%3D)
+![企业微信截图_17331365008842.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/1c2378b979af4adab54ce3488ba45a78~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=UESKSDT3eQPdotGC6jjEorSqoWo%3D)
 
 查看本地打印以及日志文件内容
 
-![企业微信截图_1733136636853.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ae695a11aaa548fabec11cd62be7c3a4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=n9EbJdDIIVu%2Be3%2BHQ4z8CTQ1HcY%3D)
+![企业微信截图_1733136636853.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/ae695a11aaa548fabec11cd62be7c3a4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=%2BMDO7clKmd52x6wWBcI08bOKx%2FU%3D)
 
-![企业微信截图_17331366661836.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f50ceaa9f2b24f479ee6a22d0176f6d4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=m%2Bk0NG5OzMZpxQMB4mgP9gcrX8Y%3D)
+![企业微信截图_17331366661836.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f50ceaa9f2b24f479ee6a22d0176f6d4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=FwyHXFlyjQAe9gzMVQpnPmA3bto%3D)
 
 - 再尝试请求成功的接口
 
-![企业微信截图_17331367812242.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a8518aabe74a4e50a55a9e24b5020158~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=ZtJcP9jodA67I9mDa24frLJ7354%3D)
+![企业微信截图_17331367812242.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/a8518aabe74a4e50a55a9e24b5020158~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=i29Dc9VEFB4W0i1XA%2FLw7K9AD3M%3D)
 
 查看本地打印以及日志文件内容，也是没问题的。
 
-![企业微信截图_17331368324588.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/fb01129fb02b4859928f4c1159cb1a34~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=iEcn1v%2BXm%2FXi4B1GPpeAviMZgt8%3D)
+![企业微信截图_17331368324588.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/fb01129fb02b4859928f4c1159cb1a34~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=wJD7YZT7zWVfQhYfNtqfVm1kbKE%3D)
 
-![企业微信截图_17331368601722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f22073519d5549a890068de1321ebbf0~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=35csHJpyX8nGbOludMV9y23jy2s%3D)
+![企业微信截图_17331368601722.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/f22073519d5549a890068de1321ebbf0~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=lVCQymmVyOXNI123VHOe4zhpHZY%3D)
 
 至此日志也完成啦\~
 
@@ -2061,14 +2089,32 @@ this.redisService.set(signupData.username, signupData.password);
       }
     }
 
+- 在 `timer.module.ts` 中写入
+
+<!---->
+
+    import { Module } from '@nestjs/common';
+    import { TimerController } from './timer.controller';
+    import { ScheduleModule } from '@nestjs/schedule'; // 导入调度模块
+    import { TimerService } from './timer.service';
+
+    @Module({
+      imports: [ScheduleModule.forRoot()],
+      controllers: [TimerController],
+      providers: [TimerService],
+    })
+    export class TimerModule {}
+
 - 在 `apifox` 中调用 `/timer/start-timer`，在控制台可以看到每隔 5 秒就会执行一次
 
-![企业微信截图_173322520991.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/8766c83ada5946b49cef965f91a94d7f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=ueLxqugnnql4Ehs2wfPaRhxcE9E%3D)
+![企业微信截图_173322520991.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/8766c83ada5946b49cef965f91a94d7f~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=tBwc0SmbXFQqbdxPaJVC9LZPI0w%3D)
 
-![企业微信截图_17332252539480.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e72063bf046949e096eb19345982c7e8~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=IoJwt5lXQwJP4sSvR%2F6f9M4Mnkk%3D)
+![企业微信截图_17332252539480.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/e72063bf046949e096eb19345982c7e8~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=8bQ%2Bh2bgE80JLGh5TkQj6HEkOxs%3D)
 
 - 销毁定时器，调用后定时器不再执行
 
-![企业微信截图_17332252992784.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/14e115a5356c45eb8e105f8e5820a2a4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1733830574&x-orig-sign=nNReC%2FxcABCqF%2BV3zzmCz%2FP4%2FE8%3D)
+![企业微信截图_17332252992784.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/14e115a5356c45eb8e105f8e5820a2a4~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgX2ppYW5n:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiODYyNDg3NTIyMzE0MzY2In0%3D&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1742990783&x-orig-sign=EufbXoLQufaavOYI4q5utRv7yvI%3D)
 
 好了，你已经成功入门 `nestjs` 了，真棒，能够看到这里相信你一定有所收获，觉得不错可以给文章点个赞\~
+
+## 接入消息队列 mq

@@ -8,7 +8,7 @@ export class RedisService {
   constructor() {
     // 配置 Redis 连接
     this.redisClient = new Redis({
-      host: '121.4.86.16', // Redis 服务器地址
+      host: '129.211.13.9', // Redis 服务器地址
       port: 6379, // Redis 端口
       password: 'jiang', // 如果设置了密码，请输入
       db: 0, // 使用的 Redis 数据库，默认为 0
