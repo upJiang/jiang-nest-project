@@ -2,6 +2,8 @@
 theme: condensed-night-purple
 ---
 
+[掘金原文地址](https://juejin.cn/post/7434059234760556594)
+
 `本篇文章将带你彻底入门` `nestjs`，你将学会：
 
 - 使用 `typeorm` 连接数据库，实现简单的 `CRUD`，实现接口的统一格式，自动生成 `swagger` 文档
